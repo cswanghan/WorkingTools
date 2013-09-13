@@ -19,11 +19,11 @@ import com.adwo.DBconnection.HiveConnection;
 public class GetAndroidEffect {
 
 	
-	public void GetEffect(String date)
+	public void GetEffect(String clickdate, String effectdate)
 	{
 		try{
 			Connection hive_conn = HiveConnection.getConnection();
-			String query_sql = "select concat(b.dt,' ',b.hour,':',b.time_minute,'.',b.time_second),b.* from adv_blacklist a join click_log b on a.advid = b.ad_id and a.imei = b.udid where b.dt = '" + date + "' order by concat(b.dt,' ',b.hour,':',b.time_minute,'.',b.time_second) asc";
+			String query_sql = "select concat(b.dt,' ',b.hour,':',b.time_minute,'.',b.time_second),b.* from adv_blacklist a join click_log b on a.advid = b.ad_id and a.imei = b.udid where b.dt >= '" + clickdate + "' and b.dt <= '" + effectdate + "' and a.createtime like '%" + effectdate + "%' order by concat(b.dt,' ',b.hour,':',b.time_minute,'.',b.time_second) asc";
 			Statement stmt = hive_conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query_sql);
 			HashMap<String, String> result_map = new HashMap<String, String>();
@@ -52,7 +52,7 @@ public class GetAndroidEffect {
 				.append(network).append(",").append(network).append(",").append(jailbreak).append(",").append(province_id).append(",")
 				.append(dt).append(",").append(hour);
 				
-				result_map.put(udid, sb.toString());
+				result_map.put(udid + "-" + ad_id, sb.toString());
 			}
 			
 			Iterator<String> map_iter = result_map.keySet().iterator();
@@ -74,7 +74,7 @@ public class GetAndroidEffect {
 		 */
 		// TODO Auto-generated method stub
 		GetAndroidEffect ge = new GetAndroidEffect();
-		ge.GetEffect(args[0]);
+		ge.GetEffect(args[0], args[1]);
 	}
 
 }
