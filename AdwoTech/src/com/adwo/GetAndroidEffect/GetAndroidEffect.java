@@ -19,7 +19,7 @@ import com.adwo.DBconnection.HiveConnection;
 public class GetAndroidEffect {
 
 	
-	public void GetEffect(String clickdate, String effectdate)
+	public void GetEffect(String clickdate, String effectdate, int flag)
 	{
 		try{
 			Connection hive_conn = HiveConnection.getConnection();
@@ -27,6 +27,8 @@ public class GetAndroidEffect {
 			Statement stmt = hive_conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query_sql);
 			HashMap<String, String> result_map = new HashMap<String, String>();
+			HashMap<String, Integer> count_map = new HashMap<String, Integer>();
+			int count = 0;
 			while(rs.next())
 			{
 				StringBuilder sb = new StringBuilder();
@@ -49,17 +51,48 @@ public class GetAndroidEffect {
 				sb.append(time_minute).append(",").append(time_second).append(",").append(platform_id).append(",")
 				.append(ad_id).append(",").append(req_ip).append(",").append(app_id).append(",").append(udid).append(",")
 				.append(sdk_v).append(",").append(nothing).append(",").append(device_id).append(",").append(mnc).append(",")
-				.append(network).append(",").append(network).append(",").append(jailbreak).append(",").append(province_id).append(",")
+				.append(network).append(",").append(jailbreak).append(",").append(province_id).append(",")
 				.append(dt).append(",").append(hour);
 				
-				result_map.put(udid + "-" + ad_id, sb.toString());
+				
+				
+				if(flag == 0)
+				{
+					String combinedkey = udid + "-" + ad_id;
+					result_map.put(combinedkey, sb.toString());
+				}
+				else
+				{
+					String combinedkey = udid + "-" + ad_id + "-" + app_id;
+					if(!count_map.containsKey(combinedkey))
+						count_map.put(combinedkey, 1);
+					else
+					{
+						int temp = count_map.get(combinedkey);
+						temp++;
+						count_map.put(combinedkey, temp);
+					}
+				}
+				count++;
 			}
 			
-			Iterator<String> map_iter = result_map.keySet().iterator();
-			while(map_iter.hasNext())
+			if(flag == 0)
 			{
-				String key = map_iter.next();
-				System.out.println(result_map.get(key));
+				Iterator<String> map_iter = result_map.keySet().iterator();
+				while(map_iter.hasNext())
+				{
+					String key = map_iter.next();
+					System.out.println(result_map.get(key));
+				}
+			}
+			else
+			{
+				Iterator<String> map_iter = count_map.keySet().iterator();
+				while(map_iter.hasNext())
+				{
+					String key = map_iter.next();
+					System.out.println(key + "||" + count_map.get(key));
+				}
 			}
 		}catch(Exception e)
 		{
@@ -74,7 +107,7 @@ public class GetAndroidEffect {
 		 */
 		// TODO Auto-generated method stub
 		GetAndroidEffect ge = new GetAndroidEffect();
-		ge.GetEffect(args[0], args[1]);
+		ge.GetEffect(args[0], args[1], Integer.valueOf(args[2]));
 	}
 
 }
