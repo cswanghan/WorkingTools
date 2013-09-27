@@ -58,7 +58,7 @@ public class GetAndroidEffect {
 				
 				if(flag == 0)
 				{
-					String combinedkey = udid + "-" + ad_id;
+					String combinedkey = udid + "-" + ad_id + "-" + app_id;
 					result_map.put(combinedkey, sb.toString());
 				}
 				else
