@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="D:/hive-0.9.0/hive-0.9.0/lib/hive-service-0.9.0.jar"/>
 	<classpathentry kind="lib" path="D:/hive-0.9.0/hive-0.9.0/lib/libfb303.jar"/>
 	<classpathentry kind="lib" path="D:/hadoop-1.0.1.master.backup/hadoop-1.0.1/hadoop-core-1.0.1.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Apache Software Foundation/Tomcat 7.0/lib/activemq-all-5.8.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

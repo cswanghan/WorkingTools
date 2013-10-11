@@ -25,7 +25,7 @@ public class Monitor {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Monitor	m = new Monitor();
-		m.AdvDataMonitor("2013-08-28", 1, "externalsrc/db.properties");
+		m.AdvDataMonitor("2013-09-25", 1, "externalsrc/db.properties");
 
 		/*String str = null;
 		for (int date = 21; date >= 12; date--)
