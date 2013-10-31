@@ -25,8 +25,8 @@ public class UserTagGenerationUtil {
 		// TODO Auto-generated method stub
 		UserTagGenerationUtil utg = new UserTagGenerationUtil();
 		try {
-			//utg.FileReader(0,2,"2013-01-02","externalsrc/db.properties");
-			utg.FileReader(Integer.valueOf(args[0]), Integer.valueOf(args[1]), args[2], args[3]);
+			utg.FileReader(0,1,"2013-01-02","externalsrc/db.properties");
+			//utg.FileReader(Integer.valueOf(args[0]), Integer.valueOf(args[1]), args[2], args[3]);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -86,6 +86,13 @@ public class UserTagGenerationUtil {
 		ResultSet rs = stmt.executeQuery(query);
 		String udid = null, tagid = null, action_count = null;
 		int count = 0; 
+		PreparedStatement preStmt = null;
+		java.util.Date dt=new java.util.Date();
+		Timestamp tt = new Timestamp(dt.getTime());
+		preStmt = mysql_conn.prepareStatement("INSERT INTO tag_sys_actioninfo"+
+				"(udid, tagid, appeardt, updatetime, ActionType, ActionCount)"+
+				"values(?,?,?,?,?,?) on duplicate key update ActionCount = ActionCount + ?, UpdateTime = NOW()");
+		
 		while(rs.next())
 		{
 			try{
@@ -99,11 +106,12 @@ public class UserTagGenerationUtil {
 				}
 				else
 				{
-					java.util.Date dt=new java.util.Date();
-					Timestamp tt = new Timestamp(dt.getTime());
-					PreparedStatement preStmt = mysql_conn.prepareStatement("INSERT INTO tag_sys_actioninfo"+
-							"(udid, tagid, appeardt, updatetime, ActionType, ActionCount)"+
-							"values(?,?,?,?,?,?) on duplicate key update ActionCount = ActionCount + '" + action_count + "', UpdateTime = '" + tt + "'");
+//					java.util.Date dt=new java.util.Date();
+//					Timestamp tt = new Timestamp(dt.getTime());
+//					preStmt = mysql_conn.prepareStatement("INSERT INTO tag_sys_actioninfo"+
+//							"(udid, tagid, appeardt, updatetime, ActionType, ActionCount)"+
+//							"values(?,?,?,?,?) on duplicate key update ActionCount = ActionCount + '" + action_count + "', UpdateTime = '" + tt + "'");
+//					
 					mysql_conn.setAutoCommit(false);
 					
 					preStmt.setString(1, udid);
@@ -112,20 +120,34 @@ public class UserTagGenerationUtil {
 					preStmt.setTimestamp(4, tt);
 					preStmt.setInt(5, actionid);
 					preStmt.setString(6, action_count);
+					preStmt.setString(7, action_count);
+					preStmt.addBatch();
 					
-					int j = preStmt.executeUpdate();
+					if(count > 50000)
+					{
+						count = 0;
+						preStmt.executeBatch();
+						mysql_conn.commit();
+						System.out.println("Batch Updated;");
+					}
+					/*int j = preStmt.executeUpdate();
 					mysql_conn.commit();
 					if(j!=0)
 						//System.out.println("Insert/OR/Update local db done!");
-					preStmt.close();
+					*/
+					count++;
 				}
 			}catch(Exception e)
 			{
 				e.printStackTrace();
 				System.err.println(count + ":" + udid + ";" + tagid + ";" + action_count);
 			}
-			count++;
 		}
+		preStmt.executeBatch();
+		mysql_conn.commit();
+		preStmt.executeBatch();
+		mysql_conn.commit();
+		preStmt.close();
 		conn.close();
 		mysql_conn.close();
 		System.out.println("done!");
